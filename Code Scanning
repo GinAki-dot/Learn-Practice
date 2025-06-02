@@ -1,0 +1,97 @@
+//cURL command using the API to list the code scanning alerts for an organization
+curl -L \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer <YOUR-TOKEN>" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  https://api.github.com/orgs/ORG/code-scanning/alerts
+
+//Outlines the elements of the upload-sarif action yml file
+name: 'Code Scanning : Upload SARIF'
+description: 'Upload the analysis results'
+author: 'GitHub'
+inputs:
+  sarif_file:
+    description: |
+      The SARIF file or directory of SARIF files to be uploaded to GitHub code scanning.
+      See https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/
+      uploading-a-sarif-file-to-github#uploading-a-code-scanning-analysis-with-github-actions
+      for information on the maximum number of results and maximum file size supported by code scanning.
+    required: false
+    default: '../results'
+  checkout_path:
+    description: "The path at which the analyzed repository was checked out. 
+    Used to relativize any absolute paths in the uploaded SARIF file."
+    required: false
+    default: ${{ github.workspace }}
+  token:
+    default: ${{ github.token }}
+  matrix:
+    default: ${{ toJson(matrix) }}
+  category:
+    description: String used by Code Scanning for matching the analyses
+    required: false
+  wait-for-processing:
+    description: If true, the Action will wait for the uploaded SARIF to be processed before completing.
+    required: true
+    default: "false"
+runs:
+  using: 'node12'
+  main: '../lib/upload-sarif-action.js'
+
+//Upload SARIF files generated outside your repository
+name: "Upload SARIF"
+
+// Run workflow each time code is pushed to your repository and on a schedule. 
+//The scheduled workflow runs every Thursday at 15:45 UTC.
+
+on:
+  push:
+  schedule:
+    - cron: '45 15 * * 4'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+  steps:
+    # This step checks out a copy of your repository.
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        # Path to SARIF file relative to the root of the repository
+        sarif_file: results.sarif
+
+//Upload SARIF files generated as part of a CI workflow
+```
+  name: "ESLint analysis"
+
+// Run workflow each time code is pushed to your repository and on a schedule.
+// The scheduled workflow runs every Wednesday at 15:45 UTC.
+on:
+  push:
+  schedule:
+    - cron: '45 15 * * 3'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run npm install
+        run: npm install
+      // Runs the ESlint code analysis
+      - name: Run ESLint
+        // eslint exits 1 if it finds anything to report
+        run: node_modules/.bin/eslint build docs lib script spec-main -f node_modules/@microsoft/eslint-formatter-sarif/sarif.js -o results.sarif || true
+      // Uploads results.sarif to GitHub repository using the upload-sarif action
+      - uses: github/codeql-action/upload-sarif@v1
+        with:
+          // Path to SARIF file relative to the root of the repository
+          sarif_file: results.sarif
+  ```
+
