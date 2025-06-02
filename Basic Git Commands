@@ -1,0 +1,15 @@
+//Displays the state of the working tree
+git status
+
+//Tell Git to start keeping track of changes in certain files
+git add
+
+//Save your work to a snapshot
+git commit
+
+//Allows you to see information about previous commits
+git log
+
+//Get information about all the commands
+git help
+git <command> --help
