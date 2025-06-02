@@ -1,0 +1,38 @@
+//To double-check that Git is installed
+git --version
+
+//Replace <USER_NAME> with the user name you want to use
+git config --global user.name "<USER_NAME>"
+
+//Create a user.email configuration variable, replacing <USER_EMAIL> with your e-mail address
+git config --global user.email "<USER_EMAIL>"
+
+//Check that your changes worked:
+git config --list
+
+//Create a folder named Cats
+mkdir Cats
+
+//Change to the project directory
+cd Cats
+
+//Initialize new repository and set the name of the default branch
+//For Latest Versions
+git init --initial-branch=main
+git init -b main
+
+//For Earlier Versions
+git init
+git checkout -b main
+
+//Show the status of the working tree
+git status
+
+//Show the contents of the working tree
+ls -a
+
+//Get help with what you can do with Git
+git --help
+
+
+
